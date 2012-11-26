@@ -37,8 +37,6 @@
 #include "Elevator.hpp"
 #include "ISimulationTerminal.hpp"
 
-#include <GL/glut.h>
-
 namespace elevatorSim{
 class Floor;
 class Elevator;

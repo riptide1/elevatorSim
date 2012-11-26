@@ -3,22 +3,33 @@
 ## arch:     x86_64
 ## os:       darwin
 ## compiler: clang3x
-## NOTE: this platform is not directly supported and so this makefile probably won't work without some tinkering
-## (but it did work, once). last working 11/5.
 
-CC=clang
-CXXFLAGS=-c -g -Werror -Weverything -D_ES_DARWIN -Iinc 
+WARN_CXXFLAGS=#-Weverything
+    
+## you'll need to specify this if you haven't installed boost in a standard location
+BOOST_INC_DIR=#/Users/PSUbackup/206427/psuguest/src/boost_1_52_0
 
+FLTK_CXXFLAGS=$(shell fltk-config --use-gl --use-glut --cxxflags)
+PYTHON_CXXFLAGS=$(shell python3-config --includes)
+BOOST_CXXFLAGS=-DBOOST_DATE_TIME_NO_LOCALE -I$(BOOST_INC_DIR)
+
+CXXFLAGS=-c -std=c++11 $(WARN_CXXFLAGS) $(FLTK_CXXFLAGS) $(PYTHON_CXXFLAGS) $(BOOST_CXXFLAGS) -D_ES_DARWIN
+
+## you'll need to specify this if you haven't installed boost in a standard location
+BOOST_LIB_DIR=#/Users/PSUbackup/206427/psuguest/src/boost_1_52_0/stage/lib
+
+FLTK_LDFLAGS=$(shell fltk-config --use-gl --use-glut --ldflags)
+PYTHON_LDFLAGS=$(shell python3-config --ldflags)
+BOOST_LDFLAGS=-L$(BOOST_LIB_DIR) -lboost_system -lboost_thread -lboost_chrono -lboost_program_options
+
+LDFLAGS=-lSystem $(FLTK_LDFLAGS) $(PYTHON_LDFLAGS) $(BOOST_LDFLAGS)
+
+CC=clang++
+RM=rm
 OUT=elevatorSim
-LDFLAGS=-lstdc++ -lSystem
-FRAMEWORKS_LDFLAGS=-framework AppKit -framework Quartz -framework OpenGL -framework GLUT -framework AGL
-COOKED_DEPS_LDFLAGS=-Ldeps/x86_64.darwin.clang3x/fltk -Ldeps/x86_64.darwin.clang3x/boost\
--lfltk -lfltk_forms -lfltk_gl -lfltk_images -lfltk_jpeg -lfltk_png\
--lboost_iostreams -lboost_system -lboost_thread -lboost_chrono -lboost_program_options
+UNIT_TEST_OUT=elevatorSimUnitTests
 
-CLIENT_OBJ=ElevatorSim.o
-
-SIM_OBJS=ElevatorSimWindow.o\
+OBJS=ElevatorSimWindow.o\
 ElevatorSimRenderWindow.o\
 ElevatorSimWelcomeWindow.o\
 cRenderObjs.o\
@@ -30,21 +41,26 @@ Location.o\
 Person.o\
 Building.o\
 Floor.o\
-SimulationTerminal.o\
+ISimulationTerminal.o\
+IStateObject.o\
+SimulationState.o\
 Logger.o
+
+CLIENT_OBJ=ElevatorSim.o
 
 UNIT_TEST_OBJS=\
 UnitTests.o\
 ElevatorUnitTests.o
 
-OBJS=$(SIM_OBJS) $(CLIENT_OBJ)
-
-elevatorSim: $(OBJS)
-	$(CC) $(OBJS) $(LDFLAGS) $(FRAMEWORKS_LDFLAGS) $(COOKED_DEPS_LDFLAGS) -o $(OUT)
+$(OUT): $(OBJS) unitTests $(CLIENT_OBJ)
+	$(CC) $(OBJS) $(CLIENT_OBJ) $(LDFLAGS) -o $(OUT)
 	@echo +success
 
+unitTests:
+	@echo -unimplemented
+
 .cpp.o:
-	$(CC) $(DEBUGFLAGS) $(CXXFLAGS) $<
+	$(CC) $(CXXFLAGS) $<
     
 clean:
-	rm -f $(OBJS)
+	$(RM) -f $(OBJS) $(CLIENT_OBJ) $(UNIT_TEST_OBJS) $(OUT) $(UNIT_TEST_OUT)

@@ -36,7 +36,6 @@
 #include "SimulationState.hpp"
 
 #include <FL/Enumerations.H>
-#include <GL/glut.h>
 
 namespace elevatorSim {
 

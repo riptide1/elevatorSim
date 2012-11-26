@@ -68,6 +68,8 @@
 #error Unspecified operating system. Use the makefile.
 #endif
 
+#include <FL/glut.H>
+
 namespace elevatorSim {
 inline bool isDebugBuild() {
 #ifndef NDEBUG
