@@ -4,7 +4,7 @@
 ## os:       darwin
 ## compiler: clang3x
 
-WARN_CXXFLAGS=#-Weverything
+WARN_CXXFLAGS=-Werror #-Weverything
     
 ## you'll need to specify this if you haven't installed boost in a standard location
 BOOST_INC_DIR=#/Users/PSUbackup/206427/psuguest/src/boost_1_52_0
