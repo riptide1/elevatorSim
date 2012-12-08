@@ -38,6 +38,9 @@
 #include <algorithm>
 #include <vector>
 
+double totalwait = 0;
+int totalpass = 0;
+
 namespace elevatorSim {
 
 /* constructors */
@@ -48,6 +51,10 @@ Person::Person(
       start = startLoc;
       destination = dest;
       priority = p;
+
+   m_dwrequest = boost::posix_time::second_clock::local_time();
+  // m_dwpickup = boost::posix_time::second_clock::local_time();
+  // wait = m_dwrequest - m_dwpickup;
 
       /* print debug info */
       if(isDebugBuild()) {
@@ -113,12 +120,20 @@ void Person::update() {
          /* TODO: choose randomly among available elevators,
          * (in preparation for making this a scriptable choice) */
          Elevator * elevatorToBoard  = *candidateElevators.begin();
+		 
+		 setPickuptime(); 
+		 totalpass++;
+		 setWaittime();
+		 totalwait += getWaittime();
+
+		 printf("totalpass = %d,	totalwait = %f \n", totalpass, totalwait);
 
          /* move ourselves to this elevator */
          elevatorToBoard -> addPerson( this );
 
          /* remove ourselves from our containing floor */
          assert( floorContainer -> removePerson( this ) );
+		 
       }
    } else if( container->getCarrierType() == IPersonCarrier::ELEVATOR_CARRIER) {
       Elevator* elevatorContainer = static_cast<Elevator*> (container);
@@ -186,6 +201,28 @@ IPersonCarrier* Person::locateContainer() const {
 
    assert( container != NULL );
    return container;
+}
+
+boost::posix_time::ptime Person::getRequesttime(){
+	   return m_dwrequest;
+}
+boost::posix_time::ptime Person::getPickuptime(){
+	   return m_dwpickup;
+
+}
+double Person::getWaittime(){
+	
+	return wait.total_seconds();
+}
+   
+void Person::setRequesttime(){
+	  m_dwrequest = boost::posix_time::second_clock::local_time();
+}
+void Person::setPickuptime(){
+	   m_dwpickup = boost::posix_time::second_clock::local_time();
+}
+void Person::setWaittime(){
+	 wait = getPickuptime() - getRequesttime();
 }
 
 } /* namespace ElevatorSim */

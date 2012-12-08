@@ -39,6 +39,14 @@
 
 #include <algorithm>
 
+#include "ElevatorSim.hpp"
+#include "SimulationState.hpp"
+#include "IStateObject.hpp"
+
+#include <boost/date_time/posix_time/posix_time.hpp>
+
+
+
 namespace elevatorSim {
 
 class Building;
@@ -65,6 +73,10 @@ class Person : public ISimulationTerminal {
    Location destination;
    enum PRIORITY priority;
 
+   boost::posix_time::ptime m_dwrequest;
+   boost::posix_time::ptime m_dwpickup;
+   boost::posix_time::time_duration wait;
+
    /* private methods */
 
    /* constructors */
@@ -89,6 +101,14 @@ public:
    enum PRIORITY getPriority() const {
       return priority;
    }
+
+   boost::posix_time::ptime getRequesttime();
+   boost::posix_time::ptime getPickuptime();
+   double getWaittime();
+   
+   void setRequesttime();
+   void setPickuptime();
+   void setWaittime();
 
    /* public methods inherited from ISimulationTerminal*/
    void init();
